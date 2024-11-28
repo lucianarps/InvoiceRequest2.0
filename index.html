@@ -47,22 +47,26 @@
         }
         .form-group input {
             width: 100%;
-            padding: 12px;
+            padding: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 14px;
+            height: 30px;
         }
-        .product-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        .product-row label {
-            flex: 1;
-        }
-        .product-row input[type="number"] {
-            width: 60px;
+        .products-table th,
+        .products-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
             text-align: center;
+        }
+        .products-table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
         }
         .buttons {
             display: flex;
@@ -82,21 +86,6 @@
         .send-btn {
             background-color: #3498db;
             color: white;
-        }
-
-        /* Responsiveness */
-        @media (max-width: 768px) {
-            .form-group input {
-                font-size: 14px;
-                padding: 10px;
-            }
-            .buttons button {
-                font-size: 14px;
-                padding: 8px 16px;
-            }
-            header h1, header h2 {
-                font-size: 18px;
-            }
         }
     </style>
 </head>
@@ -127,42 +116,45 @@
                     <label for="email">Email</label>
                     <input type="email" id="email" required>
                 </div>
-                <div class="form-group">
-                    <label for="addressLine1">Address Line 1</label>
-                    <input type="text" id="addressLine1">
-                </div>
-                <div class="form-group">
-                    <label for="unit">Unit</label>
-                    <input type="text" id="unit">
-                </div>
-                <div class="form-group">
-                    <label for="neighborhood">Neighborhood</label>
-                    <input type="text" id="neighborhood">
-                </div>
-                <div class="form-group">
-                    <label for="postalCode">Postal Code</label>
-                    <input type="text" id="postalCode">
-                </div>
             </div>
 
             <!-- Products Section -->
             <div class="section">
                 <h3>Products</h3>
-                <div class="product-row">
-                    <input type="checkbox" id="book1Check" name="product" value="Book Title 1">
-                    <label for="book1Check">Santa´s Challenge Book</label>
-                    <input type="number" id="book1Qty" placeholder="Qty" min="0">
-                </div>
-                <div class="product-row">
-                    <input type="checkbox" id="book2Check" name="product" value="Book Title 2">
-                    <label for="book2Check">A Magical Garden Adventure</label>
-                    <input type="number" id="book2Qty" placeholder="Qty" min="0">
-                </div>
-                <div class="product-row">
-                    <input type="checkbox" id="book3Check" name="product" value="Book Title 3">
-                    <label for="book3Check">Farm´s Challenge Book</label>
-                    <input type="number" id="book3Qty" placeholder="Qty" min="0">
-                </div>
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Product</th>
+                            <th>Unit Price</th>
+                            <th>Suggested Price</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" id="book1Check"></td>
+                            <td>Santa's Challenge Book</td>
+                            <td>$10.00</td>
+                            <td>$15.00</td>
+                            <td><input type="number" id="book1Qty" placeholder="Qty" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" id="book2Check"></td>
+                            <td>A Magical Garden Adventure</td>
+                            <td>$12.00</td>
+                            <td>$18.00</td>
+                            <td><input type="number" id="book2Qty" placeholder="Qty" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" id="book3Check"></td>
+                            <td>Farm's Challenge Book</td>
+                            <td>$8.00</td>
+                            <td>$12.00</td>
+                            <td><input type="number" id="book3Qty" placeholder="Qty" min="0"></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <!-- Options Section -->
@@ -201,26 +193,15 @@
             const phone = document.getElementById('phone').value;
             const email = document.getElementById('email').value;
 
-            const address = `
-                Address Line 1: ${document.getElementById('addressLine1').value || 'N/A'}
-                Unit: ${document.getElementById('unit').value || 'N/A'}
-                Neighborhood: ${document.getElementById('neighborhood').value || 'N/A'}
-                Postal Code: ${document.getElementById('postalCode').value || 'N/A'}
-            `;
-
-            const selectedProducts = [];
             const products = [
-                { check: 'book1Check', qty: 'book1Qty', name: 'Book Title 1' },
-                { check: 'book2Check', qty: 'book2Qty', name: 'Book Title 2' },
-                { check: 'book3Check', qty: 'book3Qty', name: 'Book Title 3' },
+                { check: 'book1Check', name: 'Santa´s Challenge Book', unitPrice: 10.00, suggestedPrice: 15.00, qty: document.getElementById('book1Qty').value || 0 },
+                { check: 'book2Check', name: 'A Magical Garden Adventure', unitPrice: 12.00, suggestedPrice: 18.00, qty: document.getElementById('book2Qty').value || 0 },
+                { check: 'book3Check', name: 'Farm´s Challenge Book', unitPrice: 8.00, suggestedPrice: 12.00, qty: document.getElementById('book3Qty').value || 0 }
             ];
 
-            products.forEach(product => {
-                if (document.getElementById(product.check).checked) {
-                    const qty = document.getElementById(product.qty).value || 0;
-                    selectedProducts.push(`${product.name}: ${qty}`);
-                }
-            });
+            const selectedProducts = products
+                .filter(product => document.getElementById(product.check).checked && product.qty > 0)
+                .map(product => `${product.name}: Qty ${product.qty}, Unit Price $${product.unitPrice.toFixed(2)}, Suggested Price $${product.suggestedPrice.toFixed(2)}`);
 
             const shipping = document.getElementById('shipping').checked ? "Shipping: Yes" : "Shipping: No";
             const taxes = document.getElementById('taxes').checked ? "Taxes: Yes" : "Taxes: No";
@@ -232,9 +213,6 @@
                 Contact: ${contactName}
                 Phone: ${phone}
                 Email: ${email}
-
-                Delivery Address:
-                ${address}
 
                 Products:
                   ${selectedProducts.join('\n  ')}
